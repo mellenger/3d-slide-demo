@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailspin Water Slide - Interactive 3D Experience</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="brand">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDJMMjggMTZMMTYgMzBMNCAxNkwxNiAyWiIgZmlsbD0iIzAwN0FGRiIvPgo8L3N2Zz4K" alt="Whitewater West" class="logo">
+                <span class="brand-text">Whitewater West</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#specifications" class="nav-link">Specifications</a>
+                <a href="ar-viewer.html" class="nav-link nav-cta">Enhanced AR View</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">NEW RELEASE</div>
+                <h1 class="hero-title">
+                    <span class="hero-title-main">Tailspin</span>
+                    <span class="hero-title-sub">Revolutionary Water Slide Experience</span>
+                </h1>
+                <p class="hero-description">
+                    Experience the future of water park attractions with our signature spiral design, 
+                    advanced water effects, and immersive sensory features.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-number">75ft</div>
+                        <div class="stat-label">Height</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">45mph</div>
+                        <div class="stat-label">Max Speed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">360°</div>
+                        <div class="stat-label">Spiral Experience</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Experience Section -->
+    <section class="experience" id="features">
+        <div class="experience-container">
+            <div class="experience-grid">
+                <!-- 3D Viewer -->
+                <div class="viewer-section">
+                    <div class="viewer-header">
+                        <h2>Interactive 3D Model</h2>
+                        <div class="viewer-controls">
+                            <button class="control-btn" id="fullscreen-btn">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/>
+                                </svg>
+                            </button>
+                            <button class="control-btn" id="reset-view">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="viewer-container">
+                        <div id="three-d-viewer">
+                            <canvas id="three-canvas"></canvas>
+                            <div class="controls-overlay">
+                                <div class="ar-controls">
+                                    <button id="ar-button" class="ar-button primary">
+                                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16" class="ar-icon">
+                                            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                        </svg>
+                                        View in AR
+                                    </button>
+                                    <a id="ar-link" rel="ar" href="GLB%20test.glb" class="ar-link hidden">
+                                        <button class="ar-button secondary">iOS AR</button>
+                                    </a>
+                                </div>
+                                <div class="interaction-hint">
+                                    <span class="hint-text">Drag to rotate • Scroll to zoom</span>
+                                </div>
+                            </div>
+                            <div class="loading-screen" id="loading-screen">
+                                <div class="loading-content">
+                                    <div class="spinner"></div>
+                                    <p>Loading 3D Model...</p>
+                                    <div class="loading-progress">
+                                        <div class="progress-bar" id="progress-bar"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Features Panel -->
+                <div class="features-section">
+                    <div class="features-header">
+                        <h2>Key Features</h2>
+                        <p class="features-subtitle">Explore the innovative elements that make Tailspin extraordinary</p>
+                    </div>
+                    
+                    <div class="features-list">
+                        <div class="feature-card active" data-camera-target="first-drop">
+                            <div class="feature-icon">
+                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                    <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                                </svg>
+                            </div>
+                            <div class="feature-content">
+                                <h3>The First Drop</h3>
+                                <p>A 75-foot steep plunge engineered for the perfect entry angle, maximizing speed and rider momentum into the signature spiral.</p>
+                                <div class="feature-specs">
+                                    <span class="spec">75ft drop</span>
+                                    <span class="spec">42° angle</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card" data-camera-target="water-effects">
+                            <div class="feature-icon">
+                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 16a6 6 0 0 0 6-6c0-1.655-1.122-2.904-2.432-4.362C10.254 4.176 8.75 2.503 8 0c0 0-6 5.686-6 10a6 6 0 0 0 6 6zM6.646 4.646l.708.708c-.29.29-1.128 1.311-1.707 2.87l-.894-.448c.85-1.285 1.236-2.41 1.416-3.130z"/>
+                                </svg>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Water Effects</h3>
+                                <p>Advanced water jet systems create dynamic splash patterns and cooling effects at key ride moments.</p>
+                                <div class="feature-specs">
+                                    <span class="spec">12 water jets</span>
+                                    <span class="spec">Smart activation</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card" data-camera-target="sound-light">
+                            <div class="feature-icon">
+                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8z"/>
+                                </svg>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Sound & Light Effects</h3>
+                                <p>Immersive LED lighting and surround sound systems create a multi-sensory experience throughout the ride.</p>
+                                <div class="feature-specs">
+                                    <span class="spec">RGB LEDs</span>
+                                    <span class="spec">Surround audio</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card" data-camera-target="extreme-gs">
+                            <div class="feature-icon">
+                                <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                                    <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319z"/>
+                                </svg>
+                            </div>
+                            <div class="feature-content">
+                                <h3>Extreme G-Forces</h3>
+                                <p>Precisely engineered banking angles and curve radii deliver thrilling yet safe G-force experiences.</p>
+                                <div class="feature-specs">
+                                    <span class="spec">3.2G max</span>
+                                    <span class="spec">Safety certified</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cta-section">
+                        <a href="ar-viewer.html" class="cta-button">
+                            <span>Launch Enhanced AR Experience</span>
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Specifications Section -->
+    <section class="specifications" id="specifications">
+        <div class="spec-container">
+            <div class="spec-header">
+                <h2>Technical Specifications</h2>
+                <p>Engineering excellence meets thrilling performance</p>
+            </div>
+            
+            <div class="spec-grid">
+                <div class="spec-category">
+                    <h3>Dimensions</h3>
+                    <div class="spec-list">
+                        <div class="spec-item">
+                            <span class="spec-label">Total Height</span>
+                            <span class="spec-value">75 ft (22.9 m)</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Slide Length</span>
+                            <span class="spec-value">420 ft (128 m)</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Footprint</span>
+                            <span class="spec-value">180 × 120 ft</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="spec-category">
+                    <h3>Performance</h3>
+                    <div class="spec-list">
+                        <div class="spec-item">
+                            <span class="spec-label">Max Speed</span>
+                            <span class="spec-value">45 mph (72 km/h)</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Capacity</span>
+                            <span class="spec-value">240 riders/hour</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Ride Duration</span>
+                            <span class="spec-value">25-30 seconds</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="spec-category">
+                    <h3>Safety Features</h3>
+                    <div class="spec-list">
+                        <div class="spec-item">
+                            <span class="spec-label">Safety Systems</span>
+                            <span class="spec-value">Triple redundancy</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Water Depth</span>
+                            <span class="spec-value">4.5 ft landing pool</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Certification</span>
+                            <span class="spec-value">IAAPA compliant</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>

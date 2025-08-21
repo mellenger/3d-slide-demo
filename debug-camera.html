@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Camera Tracking</title>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        
+        model-viewer {
+            width: 600px;
+            height: 400px;
+            background: white;
+            margin-bottom: 20px;
+        }
+        
+        .debug-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .event-log {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            height: 200px;
+            overflow-y: scroll;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Model-Viewer Camera Debug Test</h1>
+    
+    <model-viewer 
+        id="debug-viewer"
+        src="GLB test.glb"
+        camera-controls
+        auto-rotate
+        camera-orbit="45deg 75deg 10m"
+        min-camera-orbit="auto auto 2m"
+        max-camera-orbit="auto auto 200m">
+    </model-viewer>
+    
+    <div class="debug-info">
+        <h3>Camera Position Debug</h3>
+        <div><strong>Current Orbit:</strong> <span id="current-orbit">Not loaded</span></div>
+        <div><strong>Last Update:</strong> <span id="last-update">Never</span></div>
+        <div><strong>Update Count:</strong> <span id="update-count">0</span></div>
+        <div><strong>Events Fired:</strong> <span id="events-fired">None</span></div>
+        
+        <div style="margin-top: 15px;">
+            <button onclick="manualUpdate()">Manual Update</button>
+            <button onclick="clearLog()">Clear Log</button>
+            <button onclick="testCamera()">Test Camera Change</button>
+            <button onclick="logModelViewerProps()">Log Properties</button>
+        </div>
+        
+        <div class="event-log" id="event-log"></div>
+    </div>
+
+    <script>
+        const modelViewer = document.getElementById('debug-viewer');
+        let updateCount = 0;
+        let eventsFired = [];
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById('event-log');
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function updateDisplay() {
+            updateCount++;
+            const now = new Date().toLocaleTimeString();
+            
+            try {
+                const orbit = modelViewer.cameraOrbit;
+                document.getElementById('current-orbit').textContent = orbit || 'undefined';
+                document.getElementById('last-update').textContent = now;
+                document.getElementById('update-count').textContent = updateCount;
+                document.getElementById('events-fired').textContent = eventsFired.join(', ');
+                
+                log(`UPDATE: ${orbit || 'undefined'}`);
+            } catch (error) {
+                log(`ERROR: ${error.message}`);
+            }
+        }
+        
+        function manualUpdate() {
+            log('MANUAL UPDATE TRIGGERED');
+            updateDisplay();
+        }
+        
+        function clearLog() {
+            document.getElementById('event-log').innerHTML = '';
+            updateCount = 0;
+            eventsFired = [];
+        }
+        
+        function testCamera() {
+            const randomAzimuth = Math.floor(Math.random() * 360);
+            const randomElevation = Math.floor(Math.random() * 90);
+            const newOrbit = `${randomAzimuth}deg 75deg 15m`;
+            
+            log(`SETTING CAMERA TO: ${newOrbit}`);
+            modelViewer.cameraOrbit = newOrbit;
+            
+            setTimeout(updateDisplay, 100);
+        }
+        
+        function logModelViewerProps() {
+            log('=== MODEL-VIEWER PROPERTIES ===');
+            log(`cameraOrbit: ${modelViewer.cameraOrbit}`);
+            log(`cameraTarget: ${modelViewer.cameraTarget}`);
+            log(`loaded: ${modelViewer.loaded}`);
+            log(`autoRotate: ${modelViewer.autoRotate}`);
+            
+            // Check if the model-viewer has the expected methods/properties
+            log(`Has addEventListener: ${typeof modelViewer.addEventListener === 'function'}`);
+            log(`Constructor: ${modelViewer.constructor.name}`);
+        }
+        
+        // Event listeners with logging
+        const events = [
+            'camera-change',
+            'load', 
+            'progress',
+            'mousedown',
+            'mouseup', 
+            'mousemove',
+            'wheel',
+            'touchstart',
+            'touchend',
+            'touchmove'
+        ];
+        
+        events.forEach(eventName => {
+            modelViewer.addEventListener(eventName, (event) => {
+                if (!eventsFired.includes(eventName)) {
+                    eventsFired.push(eventName);
+                }
+                
+                log(`EVENT: ${eventName}`);
+                
+                if (eventName === 'camera-change' || eventName === 'load') {
+                    setTimeout(updateDisplay, 10);
+                }
+            });
+        });
+        
+        // Initial load
+        setTimeout(() => {
+            log('INITIAL LOAD CHECK');
+            updateDisplay();
+        }, 1000);
+        
+        // Periodic check
+        setInterval(() => {
+            if (modelViewer.cameraOrbit) {
+                const currentOrbit = modelViewer.cameraOrbit;
+                const displayedOrbit = document.getElementById('current-orbit').textContent;
+                
+                if (currentOrbit !== displayedOrbit && displayedOrbit !== 'undefined') {
+                    log(`PERIODIC UPDATE DETECTED CHANGE: ${currentOrbit}`);
+                    updateDisplay();
+                }
+            }
+        }, 500);
+    </script>
+</body>
+</html>

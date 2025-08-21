@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowRider Features & Benefits - 3D Demo</title>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Avenir:wght@350;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.typekit.net/kmn1pse.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #ffffff;
+            color: #1c355e;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 64px;
+        }
+
+        .title {
+            font-family: 'futura-pt', 'Arial', serif;
+            font-size: 48px;
+            font-weight: 400;
+            text-align: center;
+            color: #1c355e;
+            margin-bottom: 48px;
+            line-height: 1.2;
+        }
+
+        .content-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 48px;
+        }
+
+        .model-container {
+            width: 720px;
+            background: #ffffff;
+            border: 16px solid #3db3e3;
+            border-radius: 40px;
+            position: relative;
+        }
+
+        model-viewer {
+            width: 100%;
+            height: 492px;
+            border-radius: 16px;
+            background-color: #f8f9fa;
+        }
+
+        .features-container {
+            width: 544px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .feature-item {
+            background: #f2f2f2;
+            border-bottom: 1px solid #d2d3d4;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:first-child {
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+        }
+
+        .feature-item:last-child {
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            border-bottom: none;
+        }
+
+        .feature-item.expanded {
+            background: #ffffff;
+        }
+
+        .feature-header {
+            padding: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .feature-title {
+            font-family: 'Avenir', 'Arial', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: #1c355e;
+            flex: 1;
+        }
+
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #1c355e;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-content {
+            padding: 0 24px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .feature-item.expanded .feature-content {
+            max-height: 200px;
+            padding: 0 24px 24px 24px;
+        }
+
+        .feature-description {
+            font-family: 'Avenir', 'Arial', sans-serif;
+            font-size: 16px;
+            font-weight: 350;
+            color: #1c355e;
+            line-height: 1.5;
+        }
+
+        .feature-item.expanded .feature-icon {
+            transform: rotate(45deg);
+        }
+
+        @media (max-width: 1200px) {
+            .content-wrapper {
+                flex-direction: column;
+                gap: 32px;
+            }
+
+            .model-container,
+            .features-container {
+                width: 100%;
+                max-width: 720px;
+            }
+
+            .container {
+                padding: 40px 32px;
+            }
+
+            .title {
+                font-size: 36px;
+                margin-bottom: 32px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 16px;
+            }
+
+            .title {
+                font-size: 28px;
+            }
+
+            .model-container {
+                height: 400px;
+                padding: 16px;
+                border-width: 8px;
+                border-radius: 20px;
+            }
+
+            model-viewer {
+                height: 336px;
+            }
+
+            .feature-title {
+                font-size: 20px;
+            }
+
+            .feature-description {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Features & Benefits</h1>
+        
+        <div class="content-wrapper">
+            <!-- 3D Model Viewer -->
+            <div class="model-container">
+                <model-viewer 
+                    src="GLB test.glb"
+                    alt="FlowRider 3D Model"
+                    skybox-image="https://modelviewer.dev/shared-assets/environments/spruit_sunrise_1k_HDR.jpg"
+                    auto-rotate
+                    camera-controls
+                    shadow-intensity="1"
+                    camera-orbit="45deg 75deg 30m"
+                    min-camera-orbit="auto auto 2m"
+                    max-camera-orbit="auto auto 50m"
+                    interaction-policy="always-allow"
+                    loading="eager">
+                </model-viewer>
+            </div>
+
+            <!-- Features Accordion -->
+            <div class="features-container">
+                <div class="feature-item expanded" data-feature="patented-wave">
+                    <div class="feature-header">
+                        <h3 class="feature-title">Patented Wave Technology</h3>
+                        <div class="feature-icon">−</div>
+                    </div>
+                    <div class="feature-content">
+                        <p class="feature-description">
+                            At the heart of every FlowRider is our patented sheet wave system, designed to deliver a smooth, continuous flow of water. The result is a reliable wave surface that feels authentic, performs consistently, and gives riders of all levels the confidence to step on and ride.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="feature-item" data-feature="adaptive-flow">
+                    <div class="feature-header">
+                        <h3 class="feature-title">Adaptive Flow Control</h3>
+                        <div class="feature-icon">+</div>
+                    </div>
+                    <div class="feature-content">
+                        <p class="feature-description">
+                            Advanced flow control systems allow for real-time adjustments to water speed and volume, accommodating riders of different skill levels and creating varied riding experiences from beginner-friendly flows to challenging expert conditions.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="feature-item" data-feature="durable-surface">
+                    <div class="feature-header">
+                        <h3 class="feature-title">Durable Ride Surface</h3>
+                        <div class="feature-icon">+</div>
+                    </div>
+                    <div class="feature-content">
+                        <p class="feature-description">
+                            Engineered with high-performance materials that withstand constant water flow and rider interaction, our ride surfaces maintain their integrity and performance characteristics for years of reliable operation.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="feature-item" data-feature="safety-features">
+                    <div class="feature-header">
+                        <h3 class="feature-title">Built-In Safety Features</h3>
+                        <div class="feature-icon">+</div>
+                    </div>
+                    <div class="feature-content">
+                        <p class="feature-description">
+                            Comprehensive safety systems including emergency stops, rider detection sensors, and controlled exit areas ensure maximum safety for riders while maintaining the excitement and challenge of the FlowRider experience.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="feature-item" data-feature="compact-design">
+                    <div class="feature-header">
+                        <h3 class="feature-title">Compact, Flexible Design</h3>
+                        <div class="feature-icon">+</div>
+                    </div>
+                    <div class="feature-content">
+                        <p class="feature-description">
+                            Modular design allows for installation in various spaces and configurations, making it possible to bring the FlowRider experience to locations with space constraints while maintaining full functionality and performance.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Accordion functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const featureItems = document.querySelectorAll('.feature-item');
+            
+            featureItems.forEach(item => {
+                const header = item.querySelector('.feature-header');
+                const icon = item.querySelector('.feature-icon');
+                
+                header.addEventListener('click', function() {
+                    const isExpanded = item.classList.contains('expanded');
+                    
+                    // Close all other items
+                    featureItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('expanded');
+                            otherItem.querySelector('.feature-icon').textContent = '+';
+                        }
+                    });
+                    
+                    // Toggle current item
+                    if (isExpanded) {
+                        item.classList.remove('expanded');
+                        icon.textContent = '+';
+                    } else {
+                        item.classList.add('expanded');
+                        icon.textContent = '−';
+                    }
+                    
+                    // Update model-viewer camera based on selected feature
+                    updateModelView(item.dataset.feature);
+                });
+            });
+        });
+
+        // Update 3D model view based on selected feature
+        function updateModelView(feature) {
+            const modelViewer = document.querySelector('model-viewer');
+            
+            const cameraPositions = {
+                'patented-wave': '45deg 85deg 16m',
+                'adaptive-flow': '-60deg 70deg 17m',
+                'durable-surface': '0deg 90deg 22m',
+                'safety-features': '120deg 60deg 28m',
+                'compact-design': '180deg 75deg 40m'
+            };
+            
+            if (cameraPositions[feature]) {
+                modelViewer.cameraOrbit = cameraPositions[feature];
+            }
+        }
+
+        // Initialize model viewer when loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const modelViewer = document.querySelector('model-viewer');
+            
+            modelViewer.addEventListener('load', function() {
+                console.log('FlowRider 3D model loaded successfully');
+            });
+            
+            modelViewer.addEventListener('error', function(event) {
+                console.error('Error loading 3D model:', event.detail);
+            });
+        });
+    </script>
+</body>
+</html>

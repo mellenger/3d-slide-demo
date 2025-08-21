@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailspin AR Experience - Enhanced Viewer</title>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Modern CSS Reset */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: #1a1a1a;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+
+        .brand-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-link {
+            background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .back-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
+        }
+
+        /* Main Container */
+        .main-container {
+            padding-top: 72px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            padding: 40px 0;
+            text-align: center;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .ar-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Experience Section */
+        .experience-section {
+            padding: 60px 0;
+        }
+
+        .experience-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .experience-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 60px;
+            align-items: start;
+        }
+
+        /* Viewer Section */
+        .viewer-section {
+            position: sticky;
+            top: 100px;
+        }
+
+        .viewer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .viewer-header h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .viewer-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #666;
+        }
+
+        .control-btn:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #1a1a1a;
+        }
+
+        .viewer-container {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            background: #f8fafc;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+        
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            background-color: #f8fafc;
+            border-radius: 20px;
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .control-section {
+            padding: 24px;
+            border-bottom: 1px solid #f8fafc;
+        }
+
+        .control-section:last-child {
+            border-bottom: none;
+        }
+        
+        .control-section h3 {
+            margin-bottom: 16px;
+            color: #1a1a1a;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .control-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .control-btn-action {
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            color: #1a1a1a;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        
+        .control-btn-action:hover {
+            border-color: #007AFF;
+            background: #f8faff;
+            color: #007AFF;
+            transform: translateY(-1px);
+        }
+
+        .control-btn-action.primary {
+            background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .control-btn-action.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
+        }
+        
+        .slider-control {
+            margin-top: 16px;
+        }
+        
+        .slider-control label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 14px;
+        }
+        
+        .slider-control input[type="range"] {
+            width: 100%;
+            margin-bottom: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .slider-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #007AFF;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .slider-control input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #007AFF;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .camera-info {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 13px;
+            margin-top: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .camera-info-header {
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #1a1a1a;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .camera-values {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .camera-value {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .camera-value strong {
+            display: block;
+            color: #666;
+            font-size: 11px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .camera-value span {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        
+        .copy-btn {
+            background: #4ade80;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            background: #22c55e;
+            transform: translateY(-1px);
+        }
+
+        .full-orbit-display {
+            margin-top: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 12px;
+        }
+
+        .full-orbit-display strong {
+            color: #666;
+            font-family: 'Inter', sans-serif;
+            margin-right: 8px;
+        }
+
+        /* Usage Instructions */
+        .usage-section {
+            background: #f8faff;
+            border: 1px solid #e2e8f0;
+        }
+
+        .usage-section h3 {
+            color: #007AFF;
+        }
+
+        .instruction-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .instruction-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .instruction-icon {
+            width: 20px;
+            height: 20px;
+            background: #007AFF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .instruction-text strong {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .instruction-text {
+            color: #666;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .experience-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .viewer-section {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 16px;
+                height: 64px;
+            }
+            
+            .brand-text {
+                display: none;
+            }
+            
+            .main-container {
+                padding-top: 64px;
+            }
+            
+            .hero-section {
+                padding: 30px 0;
+            }
+            
+            .hero-content,
+            .experience-container {
+                padding: 0 16px;
+            }
+            
+            .experience-section {
+                padding: 40px 0;
+            }
+            
+            .viewer-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            
+            .viewer-container {
+                height: 60vh;
+            }
+            
+            .control-section {
+                padding: 20px;
+            }
+            
+            .control-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .camera-values {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .viewer-container {
+                height: 50vh;
+            }
+            
+            .control-section h3 {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="brand">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDJMMjggMTZMMTYgMzBMNCAxNkwxNiAyWiIgZmlsbD0iIzAwN0FGRiIvPgo8L3N2Zz4K" alt="Whitewater West" class="logo">
+                <span class="brand-text">Whitewater West</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="back-link">← Back to Main Demo</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="ar-badge">Enhanced AR Experience</div>
+                <h1 class="hero-title">Tailspin Interactive Viewer</h1>
+                <p class="hero-subtitle">Advanced 3D controls, real-time camera tracking, and immersive AR capabilities</p>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section class="experience-section">
+            <div class="experience-container">
+                <div class="experience-grid">
+                    <!-- Viewer Section -->
+                    <div class="viewer-section">
+                        <div class="viewer-header">
+                            <h2>Enhanced 3D Model</h2>
+                            <div class="viewer-controls">
+                                <button class="control-btn" onclick="resetView()" title="Reset View">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                                    </svg>
+                                </button>
+                                <button class="control-btn" onclick="toggleFullscreen()" title="Fullscreen">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="viewer-container">
+                            <model-viewer
+                                id="water-slide-viewer"
+                                src="GLB test.glb"
+                                alt="Tailspin Water Slide 3D Model"
+                                ar
+                                ar-modes="webxr scene-viewer quick-look"
+                                camera-controls
+                                auto-rotate
+                                shadow-intensity="1"
+                                environment-image="neutral"
+                                camera-orbit="45deg 75deg 8m"
+                                min-camera-orbit="auto auto 2m"
+                                max-camera-orbit="auto auto 200m"
+                                interaction-prompt="none">
+                            </model-viewer>
+                        </div>
+                    </div>
+
+                    <!-- Controls Panel -->
+                    <div class="controls-panel">
+                        <div class="control-section">
+                            <h3>
+                                <span>📍</span>
+                                Feature Views
+                            </h3>
+                            <div class="control-buttons">
+                                <button class="control-btn-action" onclick="focusOnFeature('first-drop')">The First Drop</button>
+                                <button class="control-btn-action" onclick="focusOnFeature('water-effects')">Water Effects</button>
+                                <button class="control-btn-action" onclick="focusOnFeature('sound-light')">Sound & Lights</button>
+                                <button class="control-btn-action" onclick="focusOnFeature('extreme-gs')">Extreme Gs</button>
+                            </div>
+                        </div>
+                        
+                        <div class="control-section">
+                            <h3>
+                                <span>🎮</span>
+                                Camera Controls
+                            </h3>
+                            <div class="control-buttons">
+                                <button class="control-btn-action" onclick="resetCamera()">Reset View</button>
+                                <button class="control-btn-action" onclick="toggleAutoRotate()">Toggle Rotate</button>
+                                <button class="control-btn-action" onclick="zoomToFit()">Zoom to Fit</button>
+                                <button class="control-btn-action" onclick="topView()">Top View</button>
+                            </div>
+                            
+                            <div class="slider-control">
+                                <label for="zoom-slider">Zoom Level (Distance)</label>
+                                <input type="range" id="zoom-slider" min="2" max="200" value="20" step="1" oninput="updateZoom(this.value)">
+                                <div class="slider-labels">
+                                    <span>Close (2m)</span>
+                                    <span>Far (200m)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="slider-control">
+                                <label for="rotation-speed">Auto-Rotate Speed</label>
+                                <input type="range" id="rotation-speed" min="0" max="2" value="1" step="0.1" oninput="updateRotationSpeed(this.value)">
+                                <div class="slider-labels">
+                                    <span>Stop</span>
+                                    <span>Fast</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="control-section">
+                            <h3>
+                                <span>📱</span>
+                                AR & Export
+                            </h3>
+                            <div class="control-buttons">
+                                <button class="control-btn-action primary" onclick="enterAR()">Launch AR Mode</button>
+                                <button class="control-btn-action" onclick="takeScreenshot()">Take Screenshot</button>
+                            </div>
+                        </div>
+                        
+                        <div class="control-section">
+                            <div class="camera-info" id="camera-info">
+                                <div class="camera-info-header">
+                                    <span>📷</span>
+                                    Live Camera Position
+                                </div>
+                                <div class="camera-values">
+                                    <div class="camera-value">
+                                        <strong>Azimuth</strong>
+                                        <span id="azimuth-value">Loading...</span>
+                                    </div>
+                                    <div class="camera-value">
+                                        <strong>Elevation</strong>
+                                        <span id="elevation-value">Loading...</span>
+                                    </div>
+                                    <div class="camera-value">
+                                        <strong>Radius</strong>
+                                        <span id="radius-value">Loading...</span>
+                                    </div>
+                                </div>
+                                <button class="copy-btn" onclick="copyCurrentPosition()">Copy Current Position</button>
+                                <div class="full-orbit-display">
+                                    <strong>Full Value:</strong> <span id="full-orbit-value">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="control-section usage-section">
+                            <h3>
+                                <span>📋</span>
+                                Usage Instructions
+                            </h3>
+                            <ul class="instruction-list">
+                                <li class="instruction-item">
+                                    <div class="instruction-icon">🖱️</div>
+                                    <div class="instruction-text">
+                                        <strong>Mouse/Trackpad:</strong> Click and drag to orbit • Scroll to zoom • Right-click and drag to pan
+                                    </div>
+                                </li>
+                                <li class="instruction-item">
+                                    <div class="instruction-icon">👆</div>
+                                    <div class="instruction-text">
+                                        <strong>Touch:</strong> One finger to rotate • Pinch to zoom • Two fingers to pan
+                                    </div>
+                                </li>
+                                <li class="instruction-item">
+                                    <div class="instruction-icon">📱</div>
+                                    <div class="instruction-text">
+                                        <strong>AR Mode:</strong> Works on iOS Safari and Android Chrome with ARCore support
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        const modelViewer = document.getElementById('water-slide-viewer');
+        let isAutoRotating = true;
+        
+        // Feature camera positions (orbit values: azimuth, elevation, radius)
+        const cameraPresets = {
+            'first-drop': '-244.90deg 81.46deg 5.65m',
+            'water-effects': '-60deg 70deg 7m', 
+            'sound-light': '0deg 90deg 12m',
+            'extreme-gs': '120deg 60deg 8m'
+        };
+        
+        // Camera tracking using getCameraOrbit() API
+        modelViewer.addEventListener('camera-change', updateCameraInfo);
+        
+        function focusOnFeature(feature) {
+            if (cameraPresets[feature]) {
+                modelViewer.cameraOrbit = cameraPresets[feature];
+                modelViewer.autoRotate = false;
+                isAutoRotating = false;
+                
+                // Add transition effect
+                modelViewer.style.transition = 'all 0.8s ease';
+                setTimeout(() => {
+                    modelViewer.style.transition = '';
+                }, 800);
+            }
+        }
+        
+        function resetCamera() {
+            modelViewer.cameraOrbit = '45deg 75deg 70m';
+            modelViewer.autoRotate = true;
+            isAutoRotating = true;
+            document.getElementById('zoom-slider').value = 70;
+        }
+        
+        function resetView() {
+            resetCamera();
+        }
+        
+        function toggleAutoRotate() {
+            isAutoRotating = !isAutoRotating;
+            modelViewer.autoRotate = isAutoRotating;
+        }
+        
+        function zoomToFit() {
+            modelViewer.cameraOrbit = modelViewer.cameraOrbit.split(' ').slice(0, 2).join(' ') + ' auto';
+        }
+        
+        function topView() {
+            const currentOrbit = modelViewer.cameraOrbit.split(' ');
+            modelViewer.cameraOrbit = currentOrbit[0] + ' 90deg ' + currentOrbit[2];
+        }
+        
+        function updateZoom(value) {
+            const currentOrbit = modelViewer.cameraOrbit.split(' ');
+            modelViewer.cameraOrbit = currentOrbit[0] + ' ' + currentOrbit[1] + ' ' + value + 'm';
+        }
+        
+        function updateRotationSpeed(value) {
+            if (value == 0) {
+                modelViewer.autoRotate = false;
+                isAutoRotating = false;
+            } else {
+                modelViewer.autoRotate = isAutoRotating;
+                modelViewer.style.setProperty('--auto-rotate-delay', (2 / value) + 's');
+            }
+        }
+        
+        function enterAR() {
+            if (modelViewer.canActivateAR) {
+                modelViewer.activateAR();
+            } else {
+                alert('AR is not available on this device or browser. Try using iOS Safari or Android Chrome.');
+            }
+        }
+        
+        function takeScreenshot() {
+            const canvas = modelViewer.querySelector('canvas');
+            if (canvas) {
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'tailspin-water-slide-screenshot.png';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+            }
+        }
+        
+        function toggleFullscreen() {
+            const container = document.querySelector('.viewer-container');
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => {
+                    console.log('Error entering fullscreen:', err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        
+        function updateCameraInfo() {
+            try {
+                // Use getCameraOrbit() to get live values in spherical coordinates
+                const orbit = modelViewer.getCameraOrbit();
+
+                // Convert radians to degrees for display
+                const azimuth = orbit.theta * (180 / Math.PI);
+                const elevation = orbit.phi * (180 / Math.PI);
+                const radius = orbit.radius;
+
+                // Update the display elements
+                document.getElementById('azimuth-value').textContent = `${azimuth.toFixed(1)}°`;
+                document.getElementById('elevation-value').textContent = `${elevation.toFixed(1)}°`;
+                document.getElementById('radius-value').textContent = `${radius.toFixed(1)}m`;
+                
+                // Reconstruct the full string for the copy-paste feature
+                const fullOrbitString = `${azimuth.toFixed(1)}deg ${elevation.toFixed(1)}deg ${radius.toFixed(1)}m`;
+                document.getElementById('full-orbit-value').textContent = fullOrbitString;
+
+            } catch (error) {
+                console.error('Camera info update error:', error);
+                document.getElementById('full-orbit-value').textContent = 'Error updating camera info.';
+            }
+        }
+        
+        function copyCurrentPosition() {
+            // Get the formatted orbit string from the display
+            const orbitString = document.getElementById('full-orbit-value').textContent;
+            
+            // Copy to clipboard
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(orbitString).then(() => {
+                    // Visual feedback
+                    const btn = event.target;
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    btn.style.background = '#22c55e';
+                    
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.background = '#4ade80';
+                    }, 1500);
+                });
+            } else {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = orbitString;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                alert(`Copied to clipboard: ${orbitString}`);
+            }
+        }
+        
+        // Update camera info on load
+        modelViewer.addEventListener('load', () => {
+            updateCameraInfo();
+        });
+        
+        // Initial update
+        setTimeout(updateCameraInfo, 1000);
+    </script>
+</body>
+</html>

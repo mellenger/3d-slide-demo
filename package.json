@@ -1,0 +1,11 @@
+{
+  "name": "waterslide-viewer-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/ride-effects.test.mjs"
+  },
+  "devDependencies": {
+    "three": "0.158.0"
+  }
+}

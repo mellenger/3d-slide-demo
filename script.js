@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RideEffects } from './ride-effects.js?v=3';
 
 class WaterSlideViewer {
     constructor() {
@@ -260,29 +261,22 @@ class WaterSlideViewer {
                     }
                 });
                 
-                // Scale and position the model appropriately
+                // Preserve metre units so water and tube dimensions match the export.
                 const box = new THREE.Box3().setFromObject(this.model);
                 const center = box.getCenter(new THREE.Vector3());
                 const size = box.getSize(new THREE.Vector3());
-                
-                // Center the model
-                this.model.position.x = -center.x;
-                this.model.position.y = -center.y;
-                this.model.position.z = -center.z;
-                
-                // Scale the model to fill more of the viewer
-                const maxDimension = Math.max(size.x, size.y, size.z);
-                const scale = 55 / maxDimension; // Increased scale for better visibility
-                this.model.scale.setScalar(scale);
-                
-                console.log('Model dimensions:', size);
-                console.log('Applied scale:', scale);
-                
+                this.model.position.copy(center).multiplyScalar(-1);
+                this.model.updateMatrixWorld(true);
                 this.scene.add(this.model);
-                
-                // Update camera positions based on model bounds
-                this.updateCameraPositionsForModel(size, scale);
-                
+                this.updateCameraPositionsForModel(size, 1);
+                try {
+                    this.ride = new RideEffects(this.model, this.scene);
+                    this.setupRideControls();
+                } catch (error) {
+                    console.error('Ride preview could not start:', error);
+                    document.getElementById('ride-status').textContent = 'Animation could not start. The model is still available.';
+                }
+
                 // Hide loading screen
                 loadingScreen.classList.add('hidden');
                 
@@ -324,13 +318,53 @@ class WaterSlideViewer {
             }
         };
         
-        // Update initial camera position to frame the model better
-        this.camera.position.set(maxDim * 0.9, maxDim * 0.8, maxDim * 0.9);
-        this.controls.target.set(0, scaledSize.y * 0.4, 0);
+        this.controls.maxDistance = maxDim * 5;
+        this.controls.minDistance = 2;
+        this.overview = new THREE.Vector3(maxDim * 0.75, maxDim * 0.7, maxDim * 0.85);
+        this.resetView();
+    }
+
+    resetView() {
+        if (!this.overview) return;
+        if (this.ride) this.ride.follow = false;
+        const follow = document.getElementById('ride-follow');
+        if (follow) follow.checked = false;
+        this.camera.position.copy(this.overview);
+        this.controls.target.set(0, 0, 0);
         this.controls.update();
     }
 
+    setupRideControls() {
+        const ride = this.ride;
+        const pause = document.getElementById('ride-pause');
+        pause.disabled = false;
+        pause.textContent = ride.paused ? 'Play animation' : 'Pause animation';
+        pause.addEventListener('click', () => {
+            ride.paused = !ride.paused;
+            pause.textContent = ride.paused ? 'Play animation' : 'Pause animation';
+        });
+        document.getElementById('ride-restart').disabled = false;
+        document.getElementById('ride-restart').addEventListener('click', () => ride.restart());
+        for (const [id, key] of [['ride-water', 'waterEnabled'], ['ride-tubes', 'tubesEnabled'], ['ride-follow', 'follow']]) {
+            const input = document.getElementById(id);
+            input.disabled = false;
+            input.addEventListener('change', () => { ride[key] = input.checked; });
+        }
+        this.controls.addEventListener('start', () => {
+            ride.follow = false;
+            document.getElementById('ride-follow').checked = false;
+        });
+        console.info('Ride route:', {sections: ride.sections.size, length: ride.length, duration: ride.duration, projectionMisses: ride.routeMisses});
+    }
+
     setupUI() {
+        document.getElementById('reset-view').addEventListener('click', () => this.resetView());
+        document.getElementById('fullscreen-btn').addEventListener('click', async () => {
+            try {
+                if (document.fullscreenElement) await document.exitFullscreen();
+                else await document.querySelector('.viewer-section').requestFullscreen();
+            } catch (error) { console.warn('Fullscreen is unavailable', error); }
+        });
         // Accordion functionality
         const accordionItems = document.querySelectorAll('.accordion-item');
         
@@ -432,14 +466,33 @@ class WaterSlideViewer {
     }
     
     animate() {
-        this.renderer.setAnimationLoop(() => {
-            if (this.controls) {
-                this.controls.update();
+        let previous;
+        let lastStatus = '';
+        document.addEventListener('visibilitychange', () => { previous = undefined; });
+        this.renderer.setAnimationLoop((now) => {
+            const dt = previous === undefined || document.hidden ? 0 : Math.max(0, (now - previous) / 1000);
+            previous = now;
+            if (this.ride) {
+                const ride = this.ride;
+                ride.update(dt);
+                if (ride.follow && ride.lead) {
+                    const target = ride.lead.position;
+                    const desired = target.clone().add(new THREE.Vector3(2.6, 6, 3.2));
+                    const blend = 1 - Math.exp(-dt * 3);
+                    this.controls.target.lerp(target, blend);
+                    this.camera.position.lerp(desired, blend);
+                }
+                const status = ride.paused ? 'Animation paused' : `${ride.active} tube${ride.active === 1 ? '' : 's'} on slide · Next launch in ${Math.ceil(ride.nextLaunch)}s`;
+                if (status !== lastStatus) {
+                    document.getElementById('ride-status').textContent = status;
+                    lastStatus = status;
+                }
             }
-            
+            this.controls?.update();
             this.renderer.render(this.scene, this.camera);
         });
     }
+
 }
 
 // Initialize the viewer when the page loads
